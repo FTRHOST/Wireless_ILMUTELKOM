@@ -1,6 +1,7 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useAnimation } from 'framer-motion';
-import { Cpu, Radio, Code2, Database, Wifi, Bluetooth, Zap, Info, ArrowRightLeft, Globe, Lock, Smartphone } from 'lucide-react';
+import { Cpu, Radio, Code2, Database, Wifi, Bluetooth, Zap, Info, ArrowRightLeft, Globe, Lock, Smartphone, ArrowRight } from 'lucide-react';
 
 const TechSpecs: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'physics' | 'protocol' | 'comparison'>('physics');
@@ -206,47 +207,71 @@ const TechSpecs: React.FC = () => {
                     </motion.div>
 
                     {/* Phone Body */}
-                    <div className={`w-40 h-80 bg-gray-900 border-4 border-gray-700 rounded-[2rem] shadow-2xl relative overflow-hidden transition-all duration-200 ${isConnected ? 'animate-[shake_0.5s_ease-in-out_infinite]' : ''}`}>
+                    <div className={`w-40 h-80 bg-gray-900 border-4 ${isConnected ? 'border-cyan-500 shadow-[0_0_30px_rgba(34,211,238,0.2)]' : 'border-gray-700'} rounded-[2rem] shadow-2xl relative overflow-hidden transition-all duration-300`}>
                        {/* Notch */}
                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-b-xl z-20"></div>
                        
                        {/* Screen */}
-                       <div className="w-full h-full bg-black flex flex-col relative">
+                       <div className="w-full h-full bg-black flex flex-col relative font-sans">
                           
                           {/* State 1: Default / Dragging */}
-                          <div className={`absolute inset-0 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ${isConnected ? 'opacity-0' : 'opacity-100'}`}>
-                             <Wifi className="text-gray-600 mb-4 animate-pulse" size={32} />
-                             <p className="text-gray-500 text-center text-xs font-mono">
-                               Searching for NFC Tags...
-                             </p>
-                             <div className="mt-8 text-[10px] text-gray-700 border border-gray-800 px-2 py-1 rounded">
-                               Drag me right &rarr;
+                          <div className={`absolute inset-0 flex flex-col items-center justify-center p-5 transition-opacity duration-300 ${isConnected ? 'opacity-0' : 'opacity-100'}`}>
+                             <div className="relative mb-6">
+                                <div className="absolute inset-0 bg-cyan-500/20 rounded-full animate-ping"></div>
+                                <div className="relative bg-gray-800 p-3 rounded-full border border-gray-700">
+                                    <Radio className="text-cyan-500" size={20} />
+                                </div>
+                             </div>
+                             
+                             <div className="space-y-1 text-center mb-6">
+                                <h4 className="text-white font-bold text-sm tracking-wide">NFC ACTIVE</h4>
+                                <p className="text-gray-500 text-[10px] font-mono leading-tight">
+                                    Bring device close<br/>to poster tag
+                                </p>
+                             </div>
+
+                             <div className="flex items-center gap-2 text-[9px] text-gray-400 bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-full">
+                                <span>Slide to Scan</span>
+                                <ArrowRight size={10} className="animate-pulse" />
                              </div>
                           </div>
 
                           {/* State 2: Connected / Success */}
                           <div className={`absolute inset-0 bg-white flex flex-col transition-opacity duration-300 ${isConnected ? 'opacity-100' : 'opacity-0'}`}>
-                             {/* Mock Browser Header */}
-                             <div className="h-12 bg-gray-100 border-b flex items-end pb-2 px-3 gap-2">
-                                <div className="w-full h-6 bg-white rounded border border-gray-300 flex items-center px-2 gap-1 shadow-sm">
+                             {/* Browser Bar */}
+                             <div className="h-8 bg-gray-50 border-b flex items-center px-3 gap-2 shrink-0 pt-1">
+                                <div className="w-full h-5 bg-gray-200/50 rounded-full flex items-center px-2 gap-1.5">
                                    <Lock size={8} className="text-green-600" />
-                                   <div className="text-[6px] text-gray-600 font-sans">uin-salatiga.ac.id/promo</div>
+                                   <span className="text-[8px] text-gray-500 font-medium">uin-salatiga.ac.id/promo</span>
                                 </div>
                              </div>
-                             {/* Website Content */}
-                             <div className="flex-1 p-3 space-y-2 overflow-hidden">
-                                <div className="w-full h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-center leading-none shadow-lg">
-                                  <div>
-                                    <div className="text-xs opacity-80">WELCOME TO</div>
-                                    <div className="text-xl">UIN<br/>SALATIGA</div>
-                                  </div>
+                             
+                             {/* Web Content */}
+                             <div className="flex-1 overflow-hidden relative bg-gray-50">
+                                {/* Hero Section */}
+                                <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-4 pb-6 rounded-b-[1.5rem] shadow-sm relative z-10">
+                                    <div className="flex justify-between items-center mb-3 opacity-50">
+                                        <div className="w-3 h-3 bg-white rounded-full"></div>
+                                        <div className="w-3 h-1.5 bg-white rounded-full"></div>
+                                    </div>
+                                    <h5 className="text-white text-lg font-bold leading-tight mb-1">UIN<br/>SALATIGA</h5>
+                                    <p className="text-blue-200 text-[8px]">Smart Campus Future</p>
                                 </div>
-                                <div className="h-2 bg-gray-100 rounded w-full"></div>
-                                <div className="h-2 bg-gray-100 rounded w-3/4"></div>
-                                <div className="h-2 bg-gray-100 rounded w-1/2"></div>
-                                <button className="w-full py-2 bg-black text-white text-[8px] font-bold rounded mt-2">
-                                  GET STARTED
-                                </button>
+                                
+                                {/* Body Content */}
+                                <div className="p-3 space-y-2 relative z-0 -mt-2 pt-4">
+                                    <div className="flex gap-2">
+                                        <div className="flex-1 h-10 bg-white rounded-lg shadow-sm"></div>
+                                        <div className="flex-1 h-10 bg-white rounded-lg shadow-sm"></div>
+                                    </div>
+                                    <div className="h-16 bg-white rounded-lg shadow-sm w-full p-2 flex gap-2 items-center">
+                                       <div className="w-8 h-8 bg-gray-100 rounded-full"></div>
+                                       <div className="flex-1 space-y-1">
+                                          <div className="h-1.5 bg-gray-100 rounded w-full"></div>
+                                          <div className="h-1.5 bg-gray-100 rounded w-2/3"></div>
+                                       </div>
+                                    </div>
+                                </div>
                              </div>
                           </div>
                           
@@ -256,7 +281,7 @@ const TechSpecs: React.FC = () => {
 
                  {/* Instructions Helper */}
                  {!isConnected && (
-                   <div className="absolute bottom-10 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-20 text-gray-500 text-xs font-mono animate-bounce">
+                   <div className="absolute bottom-10 left-10 md:left-20 text-gray-500 text-xs font-mono animate-bounce opacity-50">
                      &larr; Drag Phone &rarr;
                    </div>
                  )}
