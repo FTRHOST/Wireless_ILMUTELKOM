@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useAnimation } from 'framer-motion';
-import { Cpu, Radio, Code2, Database, Wifi, Bluetooth, Zap, Info, ArrowRightLeft, Lock, ArrowRight, Smartphone } from 'lucide-react';
+import { Cpu, Radio, Code2, Database, Zap, Info, ArrowRightLeft } from 'lucide-react';
 
 const TechSpecs: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'physics' | 'protocol' | 'comparison'>('physics');
@@ -21,7 +21,9 @@ const TechSpecs: React.FC = () => {
 
   // Manage Sequence
   useEffect(() => {
-    let t1: any, t2: any, t3: any;
+    let t1: ReturnType<typeof setTimeout>;
+    let t2: ReturnType<typeof setTimeout>;
+    
     if (isConnected) {
       // Step 1: Induction (Immediate)
       setConnectionStep(1);
@@ -29,22 +31,18 @@ const TechSpecs: React.FC = () => {
       // Step 2: Load Modulation (Data travels back to phone after 400ms)
       t1 = setTimeout(() => setConnectionStep(2), 400);
       
-      // Step 3: Processing & Browser Open (after 1200ms)
+      // Step 3: Processing & Browser Open (after 1500ms total)
       t2 = setTimeout(() => setConnectionStep(3), 1500);
     } else {
       setConnectionStep(0);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
     }
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
   }, [isConnected]);
 
-  const handleDrag = (event: any, info: any) => {
+  const handleDrag = (_event: any, info: any) => {
     const threshold = 120; // px
     if (info.point.x > 0 && info.offset.x > threshold) {
       if (!isConnected) setIsConnected(true);
@@ -53,7 +51,7 @@ const TechSpecs: React.FC = () => {
     }
   };
 
-  const handleDragEnd = (event: any, info: any) => {
+  const handleDragEnd = (_event: any, _info: any) => {
     setIsConnected(false);
     controls.start({ x: 0, transition: { type: "spring", stiffness: 300, damping: 30 } });
   };
@@ -147,7 +145,7 @@ const TechSpecs: React.FC = () => {
           </div>
 
           {/* Interactive Display Area */}
-          <div className="w-full lg:w-2/3 h-[500px] md:h-[600px] bg-gray-950 rounded-2xl border border-gray-800 relative overflow-hidden shadow-2xl select-none" ref={constraintsRef}>
+          <div className="w-full lg:w-2/3 h-[500px] md:h-[600px] bg-gray-900 rounded-2xl border border-gray-800 relative overflow-hidden shadow-2xl select-none" ref={constraintsRef}>
             
             {/* PHYSICS VISUALIZATION (SIMULATOR) */}
             {activeTab === 'physics' && (
@@ -245,131 +243,127 @@ const TechSpecs: React.FC = () => {
                              </div>
                              <div className="text-center">
                                 <h4 className="text-white font-bold text-xs mb-1">SCANNING...</h4>
-                                <p className="text-[9px] text-gray-500">Approaching Tag</p>
+                                <p className="text-[9px] text-gray-500 leading-tight">Bring close to NFC Tag to read NDEF.</p>
+                             </div>
+                             
+                             {/* Slide hint */}
+                             <div className="absolute bottom-6 flex items-center gap-2 text-[9px] text-gray-600 border border-gray-800 rounded-full px-3 py-1 bg-gray-900">
+                                <span className="animate-pulse">→</span> Slide to Scan
                              </div>
                           </div>
 
-                          {/* Processing State */}
-                          <div className={`absolute inset-0 bg-gray-900 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ${connectionStep === 1 || connectionStep === 2 ? 'opacity-100' : 'opacity-0'}`}>
-                             <div className="flex gap-1 mb-2">
-                                <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce"></span>
-                                <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce delay-100"></span>
-                                <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce delay-200"></span>
-                             </div>
-                             <div className="text-[10px] font-mono text-cyan-400 text-center">
-                                {connectionStep === 1 ? "INDUCING POWER..." : "READING NDEF..."}
+                          {/* Process State (Decoding) */}
+                          <div className={`absolute inset-0 bg-gray-900 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ${connectionStep > 0 && connectionStep < 3 ? 'opacity-100' : 'opacity-0'}`}>
+                             <div className="font-mono text-[10px] text-green-400 space-y-1 w-full text-left font-bold opacity-80">
+                                <div>&gt; DETECTING FIELD...</div>
+                                {connectionStep >= 1 && <div>&gt; TAG_FOUND (ISO 14443-A)</div>}
+                                {connectionStep >= 2 && <div>&gt; READING NDEF...</div>}
                              </div>
                           </div>
 
                           {/* Success State (Browser) */}
-                          <div className={`absolute inset-0 bg-white flex flex-col transition-opacity duration-500 ${connectionStep === 3 ? 'opacity-100' : 'opacity-0'}`}>
-                             <div className="h-8 bg-gray-100 border-b flex items-center px-3 gap-2 shrink-0 pt-2">
-                                <Lock size={8} className="text-green-600" />
-                                <span className="text-[8px] text-gray-500 flex-1">uin-salatiga.ac.id</span>
+                          <div className={`absolute inset-0 bg-white transition-opacity duration-500 ${connectionStep === 3 ? 'opacity-100' : 'opacity-0'}`}>
+                             {/* Fake Browser Header */}
+                             <div className="h-8 bg-gray-100 border-b border-gray-300 flex items-center px-2 gap-1">
+                                <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                                <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                <div className="flex-1 h-5 bg-white border border-gray-300 rounded ml-2 flex items-center px-2 text-[8px] text-gray-500">
+                                   uin-salatiga.ac.id
+                                </div>
                              </div>
-                             <div className="flex-1 p-3 bg-white">
-                                <div className="w-full h-24 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg mb-3 flex items-center justify-center text-white text-center">
-                                   <div>
-                                     <h5 className="font-bold text-sm">WELCOME</h5>
-                                     <p className="text-[8px]">Mahasiswa Teknik</p>
-                                   </div>
-                                </div>
-                                <div className="space-y-2">
-                                   <div className="h-2 bg-gray-100 rounded w-full"></div>
-                                   <div className="h-2 bg-gray-100 rounded w-2/3"></div>
-                                </div>
+                             {/* Content */}
+                             <div className="p-4 flex flex-col items-center justify-center h-full text-black">
+                                <div className="text-3xl font-bold text-cyan-600 mb-1">UIN</div>
+                                <div className="text-[10px] tracking-widest text-gray-500 font-bold mb-4">SALATIGA</div>
+                                <button className="px-3 py-1 bg-cyan-600 text-white text-[8px] rounded font-bold">
+                                   VISIT WEBSITE
+                                </button>
                              </div>
                           </div>
-                          
                        </div>
                     </div>
                  </motion.div>
-
-                 {/* Instruction */}
-                 {!isConnected && (
-                   <div className="absolute bottom-10 left-10 md:left-24 text-gray-500 text-[10px] font-mono animate-bounce opacity-50">
-                     &larr; Drag to Induce
-                   </div>
-                 )}
               </motion.div>
             )}
 
-            {/* PROTOCOL VISUALIZATION (UNCHANGED) */}
+            {/* PROTOCOL VISUALIZATION */}
             {activeTab === 'protocol' && (
               <motion.div 
                 key="protocol"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-[#1e1e1e] font-mono text-xs p-6 overflow-hidden flex flex-col"
+                className="absolute inset-0 p-8 flex flex-col items-center justify-center font-mono text-xs overflow-y-auto"
               >
-                 <div className="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
-                    <div className="flex gap-2">
-                       <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                       <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
-                    <span className="text-gray-500">terminal@nfc-reader:~</span>
-                 </div>
-
-                 <div className="space-y-2 text-green-400 flex-1 overflow-y-auto custom-scrollbar">
-                    <p><span className="text-blue-400">root@android</span>:~$ nfc-poll</p>
-                    <p className="opacity-70">ISO/IEC 14443A (106 kbps) target found.</p>
-                    
-                    <div className="my-4 border-t border-dashed border-gray-700"></div>
-                    
-                    <p><span className="text-blue-400">root@android</span>:~$ read-ndef</p>
-                    <p className="text-purple-400">{'>'} Powering RF Field... OK</p>
-                    <p className="text-purple-400">{'>'} Anti-Collision Loop... OK</p>
-                    <p className="text-purple-400">{'>'} Select Application... OK</p>
-                    <p className="text-purple-400">{'>'} Reading NDEF Message...</p>
-                    
-                    <div className="bg-black/50 p-4 rounded border border-gray-700 mt-2">
-                       <p className="text-gray-500 mt-4 mb-2">PARSED NDEF RECORD:</p>
-                       <p><span className="text-pink-500">TNF:</span> 0x01 (Well-Known)</p>
-                       <p><span className="text-pink-500">Type:</span> "U" (URI)</p>
-                       <p><span className="text-pink-500">Payload:</span> "https://uin-salatiga.ac.id"</p>
+                 <div className="w-full max-w-lg space-y-4">
+                    <div className="border border-gray-800 bg-black p-4 rounded-lg">
+                       <h4 className="text-purple-400 mb-2 font-bold flex items-center gap-2"><Database size={14}/> NDEF Structure</h4>
+                       <div className="space-y-2 text-gray-400">
+                          <div className="flex"><span className="w-24 text-gray-600">Header:</span> <span>D1 (MB=1, ME=1, TNF=1)</span></div>
+                          <div className="flex"><span className="w-24 text-gray-600">Type Len:</span> <span>01 (1 byte)</span></div>
+                          <div className="flex"><span className="w-24 text-gray-600">Payload Len:</span> <span>16 (22 bytes)</span></div>
+                          <div className="flex"><span className="w-24 text-gray-600">Type:</span> <span>U (URI)</span></div>
+                          <div className="flex"><span className="w-24 text-gray-600">Payload:</span> <span className="text-green-500">uin-salatiga.ac.id</span></div>
+                       </div>
                     </div>
 
-                    <p className="animate-pulse mt-4 cursor-block">_</p>
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="border border-gray-800 bg-gray-900/50 p-4 rounded-lg">
+                          <h4 className="text-white mb-2 font-bold">Active Mode</h4>
+                          <p className="text-gray-500">Reader generates RF field. Target uses Load Modulation to reply.</p>
+                       </div>
+                       <div className="border border-gray-800 bg-gray-900/50 p-4 rounded-lg">
+                          <h4 className="text-white mb-2 font-bold">Passive Mode</h4>
+                          <p className="text-gray-500">Only Initiator generates RF field. Target is powered by field.</p>
+                       </div>
+                    </div>
                  </div>
               </motion.div>
             )}
 
-            {/* COMPARISON VISUALIZATION (UNCHANGED) */}
+            {/* COMPARISON TABLE */}
             {activeTab === 'comparison' && (
               <motion.div 
-                key="comparison"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-gray-900 p-8 overflow-y-auto custom-scrollbar"
+                 key="comparison"
+                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                 className="absolute inset-0 p-4 md:p-8 flex items-center justify-center"
               >
-                 <div className="mb-8 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                      <span className="text-xl">📐</span> Rumus Gelombang
-                    </h3>
-                    <div className="flex items-center gap-4 text-sm md:text-base font-mono bg-black/40 p-3 rounded-lg border border-gray-800">
-                       <span className="text-cyan-400 font-bold">f = c / λ</span>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-2">
-                       Frekuensi 13.56 MHz (HF) memiliki panjang gelombang ~22m. Kita beroperasi di Near Field (&lt; λ/2π).
-                    </p>
-                 </div>
-
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gray-800 border-2 border-cyan-500/50 rounded-xl p-5 relative overflow-hidden">
-                       <h4 className="text-xl font-bold text-white mb-1">NFC</h4>
-                       <p className="text-xs text-cyan-400 mb-4 font-mono">13.56 MHz</p>
-                       <ul className="text-sm text-gray-300 space-y-2">
-                          <li>&lt; 10 cm Range</li>
-                          <li>Passive Mode</li>
-                       </ul>
-                    </div>
-                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 relative overflow-hidden opacity-80">
-                       <h4 className="text-xl font-bold text-white mb-1">Bluetooth</h4>
-                       <p className="text-xs text-blue-400 mb-4 font-mono">2.4 GHz</p>
-                       <ul className="text-sm text-gray-300 space-y-2">
-                          <li>~10m Range</li>
-                          <li>Active Power</li>
-                       </ul>
-                    </div>
+                 <div className="w-full overflow-x-auto">
+                    <table className="w-full text-left border-collapse font-mono text-xs md:text-sm">
+                       <thead>
+                          <tr className="border-b border-gray-800 text-gray-400">
+                             <th className="py-4 px-2">Feature</th>
+                             <th className="py-4 px-2 text-green-400">NFC</th>
+                             <th className="py-4 px-2 text-blue-400">Bluetooth</th>
+                             <th className="py-4 px-2 text-orange-400">Wi-Fi</th>
+                          </tr>
+                       </thead>
+                       <tbody className="text-gray-300">
+                          <tr className="border-b border-gray-800/50">
+                             <td className="py-4 px-2 text-gray-500">Setup</td>
+                             <td className="py-4 px-2 font-bold text-white">&lt; 0.1s (Instant)</td>
+                             <td className="py-4 px-2">~6s (Pairing)</td>
+                             <td className="py-4 px-2">Manual</td>
+                          </tr>
+                          <tr className="border-b border-gray-800/50">
+                             <td className="py-4 px-2 text-gray-500">Range</td>
+                             <td className="py-4 px-2 font-bold text-white">&lt; 10 cm</td>
+                             <td className="py-4 px-2">~10 m</td>
+                             <td className="py-4 px-2">~100 m</td>
+                          </tr>
+                          <tr className="border-b border-gray-800/50">
+                             <td className="py-4 px-2 text-gray-500">Frequency</td>
+                             <td className="py-4 px-2">13.56 MHz</td>
+                             <td className="py-4 px-2">2.4 GHz</td>
+                             <td className="py-4 px-2">2.4 / 5 GHz</td>
+                          </tr>
+                          <tr className="border-b border-gray-800/50">
+                             <td className="py-4 px-2 text-gray-500">Use Case</td>
+                             <td className="py-4 px-2">Payment, Access</td>
+                             <td className="py-4 px-2">Audio, Peripherals</td>
+                             <td className="py-4 px-2">Internet, Network</td>
+                          </tr>
+                       </tbody>
+                    </table>
                  </div>
               </motion.div>
             )}

@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { Zap, ChevronDown, BookOpen, Settings } from 'lucide-react';
+import { Zap, BookOpen, Settings } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const controls = useAnimation();
